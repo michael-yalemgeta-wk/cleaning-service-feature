@@ -1,0 +1,16 @@
+[
+  {
+    "id": "loc-1",
+    "name": "Downtown Branch",
+    "address": "123 Main St, City Center",
+    "phone": "(555) 100-1000",
+    "active": true
+  },
+  {
+    "id": "loc-2",
+    "name": "Westside Office",
+    "address": "456 West Ave, Westside",
+    "phone": "(555) 200-2000",
+    "active": true
+  }
+]

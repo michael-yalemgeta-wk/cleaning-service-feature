@@ -1,0 +1,29 @@
+[
+  {
+    "id": "staff-1",
+    "name": "Sarah Jenkins",
+    "role": "Cleaner",
+    "email": "sarah@pristineclean.com",
+    "status": "Active",
+    "performanceRating": 4.8,
+    "jobsCompleted": 124
+  },
+  {
+    "id": "staff-2",
+    "name": "Mike Ross",
+    "role": "Supervisor",
+    "email": "mike@pristineclean.com",
+    "status": "Active",
+    "performanceRating": 4.9,
+    "jobsCompleted": 340
+  },
+  {
+    "id": "staff-3",
+    "name": "Emma Watson",
+    "role": "Cleaner",
+    "email": "emma@pristineclean.com",
+    "status": "On Leave",
+    "performanceRating": 4.7,
+    "jobsCompleted": 89
+  }
+]

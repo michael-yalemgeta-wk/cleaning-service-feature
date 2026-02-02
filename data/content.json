@@ -1,0 +1,45 @@
+{
+  "hero": {
+    "title": "Experience the Perfect Clean",
+    "subtitle": "Professional home and office cleaning services tailored to your needs. Validated, vetted, and trusted by thousands.",
+    "ctaPrimary": "Book Now",
+    "ctaSecondary": "Our Services"
+  },
+  "features": [
+    {
+      "id": "feat-1",
+      "title": "100% Satisfaction Guarantee",
+      "icon": "CheckCircle"
+    },
+    {
+      "id": "feat-2",
+      "title": "Bonded & Insured",
+      "icon": "Shield"
+    },
+    {
+      "id": "feat-3",
+      "title": "Flexible Scheduling",
+      "icon": "Clock"
+    }
+  ],
+  "testimonials": [
+    {
+      "id": "test-1",
+      "name": "Alice Johnson",
+      "rating": 5,
+      "text": "Absolutely amazing service. The team was professional and left my house sparkling clean!"
+    },
+    {
+      "id": "test-2",
+      "name": "Mark Smith",
+      "rating": 5,
+      "text": "Great attention to detail. I've used many services before, but PristineClean is the best."
+    },
+    {
+      "id": "test-3",
+      "name": "Sarah Williams",
+      "rating": 4,
+      "text": "Very good service, arrived on time and did a solid job. Will book again."
+    }
+  ]
+}
