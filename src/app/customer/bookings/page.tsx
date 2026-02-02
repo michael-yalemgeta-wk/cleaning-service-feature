@@ -1,17 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { Search, Calendar, DollarSign } from "lucide-react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
-export default function CustomerBookings() {
+// Separate component for search functionality
+function BookingsSearch() {
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
 
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
+  useEffect(() => {
+    const emailParam = searchParams.get('email');
+    if (emailParam) {
+      setEmail(emailParam);
+      performSearch(emailParam);
+    }
+  }, [searchParams]);
+
+  const performSearch = async (searchEmail: string) => {
     setLoading(true);
     setSearched(true);
     
@@ -19,7 +29,7 @@ export default function CustomerBookings() {
       const res = await fetch("/api/bookings");
       const allBookings = await res.json();
       const customerBookings = allBookings.filter((b: any) => 
-        b.email.toLowerCase() === email.toLowerCase()
+        b.email.toLowerCase() === searchEmail.toLowerCase()
       );
       setBookings(customerBookings);
     } catch (err) {
@@ -29,10 +39,13 @@ export default function CustomerBookings() {
     }
   };
 
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    performSearch(email);
+  };
+
   return (
-    <div className="container section">
-      <h1 className="text-center mb-lg">My Bookings</h1>
-      
+    <>
       <div className="card" style={{ maxWidth: '600px', margin: '0 auto 3rem' }}>
         <h2 className="mb-md">Find Your Bookings</h2>
         <form onSubmit={handleSearch}>
@@ -107,6 +120,17 @@ export default function CustomerBookings() {
           )}
         </div>
       )}
+    </>
+  );
+}
+
+export default function CustomerBookings() {
+  return (
+    <div className="container section">
+      <h1 className="text-center mb-lg">My Bookings</h1>
+      <Suspense fallback={<div>Loading search...</div>}>
+        <BookingsSearch />
+      </Suspense>
     </div>
   );
 }

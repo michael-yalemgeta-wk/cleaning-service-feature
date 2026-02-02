@@ -10,7 +10,9 @@ import {
   LogOut, 
   TrendingUp, 
   DollarSign, 
-  Briefcase 
+  Briefcase,
+  Clock,
+  Calendar
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -24,11 +26,15 @@ export default function Sidebar({ role }: { role: 'admin' | 'owner' }) {
     { href: "/admin/staff", label: "Staff", icon: Users },
     { href: "/admin/services", label: "Services", icon: Briefcase },
     { href: "/admin/content", label: "Content", icon: Settings },
+    { href: "/admin/time-slots", label: "Time Slots", icon: Clock },
+    { href: "/admin/calendar", label: "Calendar", icon: Calendar },
     { href: "/admin/notifications", label: "Notifications", icon: Settings },
+    { href: "/admin/settings", label: "Configuration", icon: Settings },
   ];
 
   const ownerLinks = [
     { href: "/owner/dashboard", label: "Overview", icon: TrendingUp },
+    { href: "/owner/calendar", label: "Calendar", icon: Calendar },
     { href: "/owner/financials", label: "Financials", icon: DollarSign },
     { href: "/owner/settings", label: "Global Settings", icon: Settings },
   ];

@@ -35,14 +35,20 @@ export async function GET() {
   const services = await getServices();
 
   // Revenue Analytics
-  const totalRevenue = bookings.reduce((sum: number, b: any) => 
-    sum + (b.payment?.amount || 0), 0
-  );
+  const totalRevenue = bookings.reduce((sum: number, b: any) => {
+    if (b.payment?.status === 'Paid') {
+      return sum + (b.payment?.amount || 0);
+    }
+    return sum;
+  }, 0);
 
   const completedBookings = bookings.filter((b: any) => b.status === 'Completed');
-  const completedRevenue = completedBookings.reduce((sum: number, b: any) => 
-    sum + (b.payment?.amount || 0), 0
-  );
+  const completedRevenue = completedBookings.reduce((sum: number, b: any) => {
+    if (b.payment?.status === 'Paid') {
+      return sum + (b.payment?.amount || 0);
+    }
+    return sum;
+  }, 0);
 
   // Monthly Revenue (last 6 months)
   const monthlyRevenue = [];

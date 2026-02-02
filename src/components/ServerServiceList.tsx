@@ -1,6 +1,8 @@
 import Link from "next/link";
 import fs from 'fs/promises';
 import path from 'path';
+import { Sparkles } from 'lucide-react';
+import { getEmbedLink } from '@/utils/imageUtils';
 
 // Direct data access since we are on the server
 async function getServices() {
@@ -27,9 +29,26 @@ export default async function ServerServiceList() {
       <div className="grid-3">
         {activeServices.map((service: any) => (
           <div key={service.id} className="card" style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ height: '200px', background: 'var(--surface-alt)', borderRadius: 'var(--radius-sm)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
-               {/* In a real app, we'd map ID to an image */}
-               {service.title}
+            <div style={{ 
+              height: '200px', 
+              background: service.imageUrl ? `url(${getEmbedLink(service.imageUrl)})` : 'var(--surface-alt)', 
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              borderRadius: 'var(--radius-sm)', 
+              marginBottom: '1.5rem', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              color: 'var(--text-muted)',
+              position: 'relative',
+              overflow: 'hidden'
+            }}>
+               {!service.imageUrl && (
+                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+                   <Sparkles size={48} />
+                   <span style={{ fontSize: '0.9rem' }}>{service.title}</span>
+                 </div>
+               )}
             </div>
             <h3 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>{service.title}</h3>
             <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', flexGrow: 1 }}>{service.description}</p>

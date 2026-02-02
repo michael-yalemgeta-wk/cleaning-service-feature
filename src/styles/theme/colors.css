@@ -1,0 +1,25 @@
+:root {
+  /* Colors - Premium Clean Palette */
+  --primary: #0f766e; /* Teal 700 */
+  --primary-dark: #115e59;
+  --secondary: #1e293b; /* Slate 800 */
+  --accent: #d97706; /* Amber 600 */
+  
+  --background: #f8fafc; /* Slate 50 */
+  --surface: #ffffff;
+  --surface-alt: #f1f5f9; /* Slate 100 */
+  
+  --text-main: #0f172a; /* Slate 900 */
+  --text-muted: #64748b; /* Slate 500 */
+  --text-inverted: #ffffff;
+  
+  --border: #e2e8f0; /* Slate 200 */
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  :root {
+    --primary: #0a5f56;
+    --border: #000;
+  }
+}

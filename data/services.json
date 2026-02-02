@@ -5,6 +5,7 @@
     "description": "Perfect for maintaining a tidy home. Includes dusting, vacuuming, floors & surfaces.",
     "price": 99,
     "duration": "2-3 hours",
+    "imageUrl": "https://cdn.pixabay.com/photo/2015/10/31/12/28/p-1015544_1280.jpg",
     "active": true
   },
   {
@@ -13,6 +14,7 @@
     "description": "Thorough top-to-bottom clean. Inside cabinets, appliances, and baseboards.",
     "price": 199,
     "duration": "4-6 hours",
+    "imageUrl": "https://t3.ftcdn.net/jpg/05/92/35/20/360_F_592352021_Tt5vmr5wqFgQJNmn0QEuDvee2j30qiBJ.jpg",
     "active": true
   },
   {
@@ -21,6 +23,7 @@
     "description": "Empty home cleaning to ensure you get your deposit back or start fresh.",
     "price": 249,
     "duration": "5-8 hours",
+    "imageUrl": "",
     "active": true
   },
   {
@@ -29,6 +32,7 @@
     "description": "Professional cleaning for workspaces, desks, and common areas.",
     "price": 149,
     "duration": "3-4 hours",
+    "imageUrl": "",
     "active": true
   },
   {
@@ -37,6 +41,7 @@
     "description": "Deep steam cleaning for carpets and rugs.",
     "price": 89,
     "duration": "1-2 hours",
+    "imageUrl": "",
     "active": true
   }
 ]

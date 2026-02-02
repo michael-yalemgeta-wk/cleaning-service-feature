@@ -12,5 +12,26 @@
     "staffId": "staff-2",
     "name": "Mike Ross",
     "id": "worker-1769080467555"
+  },
+  {
+    "username": "kb",
+    "password": "bk",
+    "staffId": "staff-1770024756006",
+    "name": "kb",
+    "id": "worker-1770024765273"
+  },
+  {
+    "username": "worked",
+    "password": "1234",
+    "staffId": "staff-3",
+    "name": "Emma Watson",
+    "id": "worker-1770024852076"
+  },
+  {
+    "username": "didy",
+    "password": "didy",
+    "staffId": "staff-1770024865406",
+    "name": "d",
+    "id": "worker-1770024874140"
   }
 ]

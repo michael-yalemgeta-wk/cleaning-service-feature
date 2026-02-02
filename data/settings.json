@@ -1,7 +1,16 @@
 {
+  "blockedDates": [
+    "2026-02-05",
+    "2026-02-06"
+  ],
+  "paymentMethods": {
+    "credit_card": false,
+    "paypal": false,
+    "cash": true
+  },
+  "taxRate": 0.08,
   "companyName": "mickey",
   "contactEmail": "hello@pristineclean.com",
-  "taxRate": 0.08,
   "currency": "USD",
   "bookingEnabled": true,
   "autoConfirm": false

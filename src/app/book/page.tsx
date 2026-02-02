@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { Check, Calendar, User, Briefcase, CreditCard } from "lucide-react";
 import Link from "next/link";
+import DatePicker from "@/components/DatePicker";
 
 function BookingForm() {
   const searchParams = useSearchParams();
@@ -22,17 +23,22 @@ function BookingForm() {
     paymentMethod: "credit_card"
   });
   const [services, setServices] = useState<any[]>([]);
-  const [settings, setSettings] = useState<any>({ taxRate: 0.08 });
+  const [settings, setSettings] = useState<any>({ 
+      taxRate: 0.08, 
+      blockedDates: [], 
+      paymentMethods: { credit_card: false, paypal: false, cash: true } // Default safe state
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
     Promise.all([
       fetch('/api/services').then(res => res.json()),
-      fetch('/api/settings').then(res => res.json())
-    ]).then(([servicesData, settingsData]) => {
+      fetch('/api/settings').then(res => res.json()),
+      fetch('/api/timeslots').then(res => res.json())
+    ]).then(([servicesData, settingsData, timeSlotsData]) => {
       setServices(servicesData.filter((s: any) => s.active !== false));
-      setSettings(settingsData);
+      setSettings({ ...settingsData, timeSlots: timeSlotsData });
     });
   }, []);
 
@@ -166,19 +172,29 @@ function BookingForm() {
           {step === 2 && (
             <div>
               <h2 className="mb-md flex items-center gap-sm"><Calendar /> Select Date & Time</h2>
-              <div className="form-group">
-                <label>Date</label>
-                <input type="date" name="date" required value={formData.date} onChange={handleInputChange} min={new Date().toISOString().split('T')[0]} />
+              <div className="form-group mb-md" style={{ display: 'flex', justifyContent: 'center' }}>
+                 <DatePicker 
+                   value={formData.date}
+                   onChange={(date) => setFormData({ ...formData, date })}
+                   blockedDates={settings.blockedDates}
+                   minDate={new Date().toISOString().split('T')[0]}
+                 />
               </div>
+              <div className="text-center mb-md">
+                <p>Selected Date: <strong>{formData.date || "None"}</strong></p>
+              </div>
+
               <div className="form-group mb-md">
                 <label>Time</label>
                 <select name="time" required value={formData.time} onChange={handleInputChange}>
                   <option value="">Select a time</option>
-                  <option value="08:00">8:00 AM</option>
-                  <option value="10:00">10:00 AM</option>
-                  <option value="12:00">12:00 PM</option>
-                  <option value="14:00">2:00 PM</option>
-                  <option value="16:00">4:00 PM</option>
+                  {settings.timeSlots?.slots
+                    ?.filter((slot: any) => slot.enabled)
+                    ?.map((slot: any) => (
+                      <option key={slot.id} value={slot.time}>
+                        {slot.time} ({slot.duration || 120} minutes)
+                      </option>
+                    ))}
                 </select>
               </div>
               <div className="flex justify-between">
@@ -243,12 +259,16 @@ function BookingForm() {
               </div>
 
               {/* Payment Method */}
+              {/* Payment Method */}
               <div className="form-group mb-lg">
                 <label>Payment Method *</label>
                 <select name="paymentMethod" value={formData.paymentMethod} onChange={handleInputChange} required>
-                  <option value="credit_card">Credit Card</option>
-                  <option value="paypal">PayPal</option>
-                  <option value="cash">Cash on Arrival</option>
+                  {settings.paymentMethods?.credit_card && <option value="credit_card">Credit Card</option>}
+                  {settings.paymentMethods?.paypal && <option value="paypal">PayPal</option>}
+                  {settings.paymentMethods?.cash && <option value="cash">Cash on Arrival</option>}
+                  {!settings.paymentMethods?.credit_card && !settings.paymentMethods?.paypal && !settings.paymentMethods?.cash && (
+                      <option value="" disabled>No payment methods available</option>
+                  )}
                 </select>
               </div>
 

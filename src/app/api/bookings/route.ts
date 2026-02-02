@@ -54,10 +54,10 @@ export async function GET() {
 export async function PUT(request: Request) {
   try {
     const body = await request.json();
-    const { id, status } = body;
+    const { id, status, assignedTo, payment } = body;
     
-    if (!id || !status) {
-       return NextResponse.json({ error: 'Missing id or status' }, { status: 400 });
+    if (!id) {
+       return NextResponse.json({ error: 'Missing id' }, { status: 400 });
     }
 
     const bookings = await getBookings();
@@ -67,9 +67,16 @@ export async function PUT(request: Request) {
        return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
     }
     
-    bookings[index].status = status;
+    // Update fields if they exist in the body
+    if (status) bookings[index].status = status;
+    if (assignedTo !== undefined) bookings[index].assignedTo = assignedTo;
+    if (payment) bookings[index].payment = { ...bookings[index].payment, ...payment };
+
     await saveBookings(bookings);
     
+    // Notifications logic (simplified for brevity, ensuring existing logic remains if needed later)
+    // In a real scenario, we'd trigger specific notifications here based on status changes like "On Way"
+
     return NextResponse.json(bookings[index]);
   } catch (error) {
     return NextResponse.json({ error: 'Failed to update' }, { status: 500 });

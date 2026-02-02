@@ -1,0 +1,97 @@
+/* Component Styles */
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-btn, var(--radius-sm)); /* Fallback to radius-sm */
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  gap: 0.5rem;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  color: var(--text-inverted);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background-color: var(--surface);
+  color: var(--text-main);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+  background-color: var(--surface-alt);
+}
+
+/* Card */
+.card {
+  background-color: var(--surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  padding: var(--spacing-md);
+  border: 1px solid var(--border);
+}
+
+/* Forms */
+.form-group {
+  margin-bottom: var(--spacing-sm);
+}
+
+label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background-color: var(--surface);
+  font-size: 1rem;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+  border-color: transparent;
+}
+
+/* Accessibility */
+button:focus-visible, a:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Mobile Touch Targets */
+@media (max-width: 768px) {
+  button, .btn, a.btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Tables */
+@media (max-width: 768px) {
+  table { font-size: 0.875rem; }
+  th, td { padding: 0.5rem !important; }
+}
+
+/* Loading */
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+  cursor: wait;
+}

@@ -1,9 +1,28 @@
 {
+  "branding": {
+    "siteName": "home cleaning",
+    "logoType": "alphabet",
+    "logoUrl": "https://img.freepik.com/free-vector/gradient-p-logo-template_23-2149372725.jpg?semt=ais_hybrid&w=740&q=80",
+    "tagline": " "
+  },
   "hero": {
     "title": "Experience the Perfect Clean",
     "subtitle": "Professional home and office cleaning services tailored to your needs. Validated, vetted, and trusted by thousands.",
+    "heroImageType": "link",
+    "backgroundImage": "https://img.freepik.com/free-vector/gradient-p-logo-template_23-2149372725.jpg?semt=ais_hybrid&w=740&q=80",
     "ctaPrimary": "Book Now",
     "ctaSecondary": "Our Services"
+  },
+  "contact": {
+    "email": "contact@pristineclean.com",
+    "phone": "(555) 123-4567",
+    "address": "123 Clean Street, Cityville, ST 12345",
+    "hours": "Mon-Fri: 8am - 6pm"
+  },
+  "socialMedia": {
+    "facebook": "",
+    "twitter": "",
+    "instagram": ""
   },
   "features": [
     {

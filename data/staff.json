@@ -25,5 +25,23 @@
     "status": "On Leave",
     "performanceRating": 4.7,
     "jobsCompleted": 89
+  },
+  {
+    "name": "kb",
+    "role": "Cleaner",
+    "email": "kta@gmail.com",
+    "status": "Active",
+    "jobsCompleted": 0,
+    "performanceRating": 0,
+    "id": "staff-1770024756006"
+  },
+  {
+    "name": "d",
+    "role": "Cleaner",
+    "email": "d@dd",
+    "status": "Active",
+    "jobsCompleted": 0,
+    "performanceRating": 0,
+    "id": "staff-1770024865406"
   }
 ]

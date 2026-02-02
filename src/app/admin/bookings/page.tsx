@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check, Clock, LogOut, Plus, UserPlus } from "lucide-react";
+import Modal from "@/components/Modal";
 
 type Booking = {
   id: string;
@@ -15,6 +16,11 @@ type Booking = {
   status: string;
   assignedTo?: string;
   tasks?: string[];
+  payment?: {
+    method: string;
+    amount: number;
+    status: string;
+  };
   createdAt: string;
 };
 
@@ -60,10 +66,24 @@ export default function BookingsPage() {
   };
 
   const assignStaff = async (bookingId: string, staffId: string) => {
+    const booking = bookings.find(b => b.id === bookingId);
+    if (!booking) return;
+
+    // Check availability
+    if (staffId) {
+      const availRes = await fetch(`/api/availability?staffId=${staffId}&date=${booking.date}&time=${booking.time}`);
+      const availData = await availRes.json();
+      
+      if (!availData.available) {
+        alert(`This staff member is already booked at ${booking.time} on ${booking.date}. Please choose a different time or staff member.`);
+        return;
+      }
+    }
+
     await fetch("/api/bookings", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: bookingId, assignedTo: staffId, status: "In Progress" }),
+      body: JSON.stringify({ id: bookingId, assignedTo: staffId, status: staffId ? "In Progress" : "Pending" }),
     });
     fetchData();
   };
@@ -144,13 +164,22 @@ export default function BookingsPage() {
                   <td style={{ padding: '1rem' }}>{booking.service}</td>
                   <td style={{ padding: '1rem' }}>
                     {booking.assignedTo ? (
-                      <span>{getStaffName(booking.assignedTo)}</span>
+                      <div className="flex items-center gap-sm">
+                        <span>{getStaffName(booking.assignedTo)}</span>
+                        <button 
+                             onClick={() => assignStaff(booking.id, "")}
+                             style={{ fontSize: '0.8rem', color: 'var(--text-muted)', border: 'none', background: 'none', cursor: 'pointer' }}
+                        >
+                            (Change)
+                        </button>
+                      </div>
                     ) : (
                       <select 
                         onChange={(e) => assignStaff(booking.id, e.target.value)}
                         style={{ fontSize: '0.875rem' }}
+                        value=""
                       >
-                        <option value="">Assign Staff...</option>
+                        <option value="" disabled>Assign Staff...</option>
                         {staff.filter(s => s.status === 'Active').map(s => (
                           <option key={s.id} value={s.id}>{s.name}</option>
                         ))}
@@ -166,9 +195,39 @@ export default function BookingsPage() {
                           style={{ padding: '0.5rem', fontSize: '0.875rem' }}
                           title="Confirm"
                         >
-                          <Check size={16} />
+                          <Check size={16} /> Confirm
                         </button>
                       )}
+                      {booking.status === 'Confirmed' && (
+                         <button 
+                           onClick={() => updateStatus(booking.id, 'On Way')} 
+                           className="btn" 
+                           style={{ padding: '0.5rem', fontSize: '0.875rem', background: '#3b82f6', color: 'white' }}
+                           title="On Way"
+                         >
+                           🚗 On Way
+                         </button>
+                      )}
+                      
+                      {/* Mark Paid Button */}
+                      {booking.payment?.status !== 'Paid' && (
+                         <button 
+                           onClick={async () => {
+                               await fetch("/api/bookings", {
+                                 method: "PUT",
+                                 headers: { "Content-Type": "application/json" },
+                                 body: JSON.stringify({ id: booking.id, payment: { status: 'Paid' } }),
+                               });
+                               fetchData();
+                           }}
+                           className="btn" 
+                           style={{ padding: '0.5rem', fontSize: '0.875rem', background: '#10b981', color: 'white' }}
+                           title="Mark Paid"
+                         >
+                           💰 Paid
+                         </button>
+                      )}
+
                       {booking.assignedTo && booking.status !== 'Completed' && (
                         <button 
                           onClick={() => {
@@ -179,8 +238,19 @@ export default function BookingsPage() {
                           style={{ padding: '0.5rem', fontSize: '0.875rem' }}
                           title="Add Task"
                         >
-                          <Plus size={16} />
+                          <Plus size={16} /> Task
                         </button>
+                      )}
+                      
+                      {booking.status !== 'Completed' && booking.status !== 'Pending' && (
+                         <button 
+                           onClick={() => updateStatus(booking.id, 'Completed')} 
+                           className="btn btn-secondary" 
+                           style={{ padding: '0.5rem', fontSize: '0.875rem' }}
+                           title="Complete"
+                         >
+                           <Check size={16} /> Done
+                         </button>
                       )}
                     </div>
                   </td>
@@ -192,41 +262,44 @@ export default function BookingsPage() {
       </div>
 
       {/* Add Task Modal */}
-      {taskModalOpen && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}>
-          <div className="card" style={{ width: '400px' }}>
-            <h2 className="mb-md">Add Task</h2>
-            <form onSubmit={addTask}>
-              <div className="form-group">
-                <label>Task Title</label>
-                <input 
-                  required 
-                  value={newTask.title} 
-                  onChange={e => setNewTask({...newTask, title: e.target.value})}
-                  placeholder="e.g., Clean kitchen"
-                />
-              </div>
-              <div className="form-group mb-lg">
-                <label>Description</label>
-                <textarea 
-                  required
-                  value={newTask.description} 
-                  onChange={e => setNewTask({...newTask, description: e.target.value})}
-                  placeholder="Task details..."
-                  rows={3}
-                ></textarea>
-              </div>
-              <div className="flex justify-between">
-                <button type="button" onClick={() => {
-                  setTaskModalOpen(false);
-                  setNewTask({ title: "", description: "" });
-                }} className="btn btn-secondary">Cancel</button>
-                <button type="submit" className="btn btn-primary">Add Task</button>
-              </div>
-            </form>
+      <Modal
+        isOpen={taskModalOpen}
+        onClose={() => {
+          setTaskModalOpen(false);
+          setNewTask({ title: "", description: "" });
+        }}
+        title="Add Task"
+        size="sm"
+      >
+        <form onSubmit={addTask}>
+          <div className="form-group">
+            <label>Task Title</label>
+            <input 
+              required 
+              value={newTask.title} 
+              onChange={e => setNewTask({...newTask, title: e.target.value})}
+              placeholder="e.g., Clean kitchen"
+            />
           </div>
-        </div>
-      )}
+          <div className="form-group mb-lg">
+            <label>Description</label>
+            <textarea 
+              required
+              value={newTask.description} 
+              onChange={e => setNewTask({...newTask, description: e.target.value})}
+              placeholder="Task details..."
+              rows={3}
+            ></textarea>
+          </div>
+          <div className="flex justify-end gap-sm">
+            <button type="button" onClick={() => {
+              setTaskModalOpen(false);
+              setNewTask({ title: "", description: "" });
+            }} className="btn btn-secondary">Cancel</button>
+            <button type="submit" className="btn btn-primary">Add Task</button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 }

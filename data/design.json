@@ -1,0 +1,17 @@
+{
+  "colors": {
+    "primary": "#0f766e",
+    "secondary": "#1e293b",
+    "accent": "#d97706",
+    "background": "#f8fafc",
+    "surface": "#ffffff"
+  },
+  "ui": {
+    "borderRadius": "0.5rem",
+    "buttonStyle": "rounded",
+    "navbarStyle": "sticky"
+  },
+  "darkMode": {
+    "enabled": true
+  }
+}
