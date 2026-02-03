@@ -14,7 +14,7 @@ export async function GET() {
   
   if (bookings) {
       // 1. Today's Tasks
-      const todaysBookings = bookings.filter((b: any) => b.date === today && b.status !== 'Done');
+      const todaysBookings = bookings.filter((b: any) => b.date === today && b.status !== 'Done' && b.status !== 'Completed');
       if (todaysBookings.length > 0) {
         systemAlerts.push({
           id: 'alert-today-bookings',
@@ -29,7 +29,7 @@ export async function GET() {
       }
 
       // 2. Unassigned Bookings
-      const unassigned = bookings.filter((b: any) => !b.assignedTo && b.status !== 'Done');
+      const unassigned = bookings.filter((b: any) => !b.assignedTo && b.status !== 'Done' && b.status !== 'Completed');
       if (unassigned.length > 0) {
         systemAlerts.push({
           id: 'alert-unassigned',
@@ -59,10 +59,6 @@ export async function GET() {
       }
   }
 
-  // Ensure types match - Prisma returns Date objects by default, convert to string for consistent API response if needed, 
-  // but frontend usually handles standard JSON serialization.
-  // Warning: notifications from Prisma have strictly typed Date objects.
-  
   return NextResponse.json([...systemAlerts, ...notifications]);
 }
 

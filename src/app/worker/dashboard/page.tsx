@@ -74,29 +74,21 @@ export default function WorkerDashboard() {
   if (loading) return <div className="container section">Loading...</div>;
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--background)' }}>
-      <div style={{ background: 'var(--surface)', borderBottom: '1px solid var(--border)', padding: '1rem 0' }}>
-        <div className="container flex justify-between items-center">
-          <div>
-            <h1 style={{ fontSize: '1.5rem' }}>Welcome, {workerName}</h1>
-            <p style={{ color: 'var(--text-muted)' }}>Your assigned tasks and jobs</p>
-          </div>
-          <button onClick={handleLogout} className="btn btn-secondary">
-            <LogOut size={18} /> Logout
-          </button>
-        </div>
+    <div className="container section">
+      <div className="mb-lg">
+        <h1 style={{ fontSize: '1.5rem' }}>Welcome, {workerName}</h1>
+        <p className="text-muted">Your assigned tasks and jobs</p>
       </div>
 
-      <div className="container section">
-        <h2 className="mb-lg flex items-center gap-sm">
-          <ClipboardList /> My Tasks
-        </h2>
+      <h2 className="mb-lg flex items-center gap-sm">
+        <ClipboardList /> My Tasks
+      </h2>
 
-        {tasks.length === 0 && bookings.length === 0 ? (
-          <div className="card text-center" style={{ padding: '3rem' }}>
-            <p style={{ color: 'var(--text-muted)' }}>No tasks assigned yet. Check back later!</p>
-          </div>
-        ) : (
+      {tasks.length === 0 && bookings.length === 0 ? (
+        <div className="card text-center" style={{ padding: '3rem' }}>
+          <p style={{ color: 'var(--text-muted)' }}>No tasks assigned yet. Check back later!</p>
+        </div>
+      ) : (
           <>
             {/* Assigned Jobs & History */}
             {bookings.length > 0 && (
@@ -216,6 +208,5 @@ export default function WorkerDashboard() {
           </>
         )}
       </div>
-    </div>
   );
 }

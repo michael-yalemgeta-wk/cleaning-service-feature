@@ -4,6 +4,16 @@ import fs from 'fs/promises';
 import path from 'path';
 import { getEmbedLink } from "@/utils/imageUtils";
 
+async function getSettings() {
+  try {
+    const filePath = path.join(process.cwd(), 'data', 'settings.json');
+    const data = await fs.readFile(filePath, 'utf-8');
+    return JSON.parse(data);
+  } catch (error) {
+    return {};
+  }
+}
+
 async function getContent() {
   try {
     const filePath = path.join(process.cwd(), 'data', 'content.json');
@@ -26,7 +36,11 @@ import DynamicTestimonials from "@/components/DynamicTestimonials";
 
 export default async function Home() {
   const content = await getContent();
+  const settings = await getSettings();
   const { hero, features } = content;
+  
+  // Use Company Name from settings if available, otherwise default
+  const displayTitle = hero?.title || (settings.companyName ? `${settings.companyName} Services` : "Experience the Perfect Clean");
 
   return (
     <>
@@ -41,7 +55,7 @@ export default async function Home() {
       }}>
         <div className="container">
           <h1 style={{ fontSize: '3.5rem', fontWeight: 800, marginBottom: '1.5rem', lineHeight: 1.2, color: 'white' }}>
-            {hero.title || "Experience the Perfect Clean"}
+            {displayTitle}
           </h1>
           <p style={{ fontSize: '1.25rem', marginBottom: '2.5rem', maxWidth: '600px', marginInline: 'auto', color: 'rgba(255,255,255,0.9)' }}>
             {hero.subtitle || "Professional home and office cleaning services tailored to your needs."}
@@ -68,7 +82,7 @@ export default async function Home() {
                  <input 
                    name="email" 
                    type="email" 
-                   placeholder="Enter email to find booking..." 
+                   placeholder={settings.email ? `Enter email (e.g. ${settings.email})` : "Enter email to find booking..."} 
                    required
                    style={{ paddingLeft: '2.5rem' }}
                  />

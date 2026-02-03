@@ -7,14 +7,22 @@ import { getEmbedLink } from "@/utils/imageUtils";
 
 export default function Navbar() {
   const [content, setContent] = useState<any>({});
+  const [settings, setSettings] = useState<any>({});
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    fetch("/api/content").then(res => res.json()).then(setContent);
+    Promise.all([
+      fetch("/api/content").then(res => res.json()),
+      fetch("/api/settings").then(res => res.json())
+    ]).then(([contentData, settingsData]) => {
+      setContent(contentData);
+      setSettings(settingsData);
+    });
   }, []);
 
   const logoUrl = getEmbedLink(content.branding?.logoUrl);
-  const siteName = content.branding?.siteName || "PristineClean";
+  // Prioritize Owner Settings Company Name, fall back to Content Branding, then default
+  const siteName = settings.companyName || content.branding?.siteName || "Cleaning Service";
 
   return (
     <nav style={{ 

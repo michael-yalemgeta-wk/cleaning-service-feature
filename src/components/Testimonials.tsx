@@ -5,7 +5,7 @@ import { Star } from "lucide-react";
 export default function Testimonials() {
   const reviews = [
     { name: "Alice Johnson", rating: 5, text: "Absolutely amazing service. The team was professional and left my house sparkling clean!" },
-    { name: "Mark Smith", rating: 5, text: "Great attention to detail. I've used many services before, but PristineClean is the best." },
+    { name: "Mark Smith", rating: 5, text: "Great attention to detail. I've used many services before, but this service is the best." },
     { name: "Sarah Williams", rating: 4, text: "Very good service, arrived on time and did a solid job. Will book again." }
   ];
 

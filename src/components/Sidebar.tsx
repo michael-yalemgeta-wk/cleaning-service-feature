@@ -12,11 +12,17 @@ import {
   DollarSign, 
   Briefcase,
   Clock,
-  Calendar
+  Calendar,
+  Activity,
+  Database,
+  Zap,
+  ClipboardList,
+  Bell,
+  User
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
-export default function Sidebar({ role }: { role: 'admin' | 'owner' }) {
+export default function Sidebar({ role }: { role: 'admin' | 'owner' | 'worker' }) {
   const pathname = usePathname();
   const router = useRouter();
   
@@ -34,16 +40,31 @@ export default function Sidebar({ role }: { role: 'admin' | 'owner' }) {
 
   const ownerLinks = [
     { href: "/owner/dashboard", label: "Overview", icon: TrendingUp },
+    { href: "/owner/notifications", label: "Notifications", icon: Activity },
+    { href: "/owner/bookings", label: "Bookings", icon: CalendarCheck },
     { href: "/owner/calendar", label: "Calendar", icon: Calendar },
+    { href: "/owner/services", label: "Services", icon: Briefcase },
+    { href: "/owner/staff", label: "Staff", icon: Users },
     { href: "/owner/financials", label: "Financials", icon: DollarSign },
     { href: "/owner/settings", label: "Global Settings", icon: Settings },
   ];
 
-  const links = role === 'owner' ? ownerLinks : adminLinks;
+  const workerLinks = [
+    { href: "/worker/dashboard", label: "Dashboard", icon: ClipboardList },
+    { href: "/worker/calendar", label: "My Schedule", icon: Calendar },
+    { href: "/worker/notifications", label: "Notifications", icon: Bell },
+    { href: "/worker/profile", label: "My Profile", icon: User },
+  ];
+
+  const links = role === 'owner' ? ownerLinks : role === 'worker' ? workerLinks : adminLinks;
 
   const handleLogout = () => {
     localStorage.removeItem("isAdmin");
     localStorage.removeItem("isOwner");
+    localStorage.removeItem("isWorker");
+    localStorage.removeItem("workerId");
+    localStorage.removeItem("workerName");
+    localStorage.removeItem("workerStaffId");
     router.push("/login");
   };
 
@@ -105,59 +126,79 @@ export default function Sidebar({ role }: { role: 'admin' | 'owner' }) {
         Logout
       </button>
 
-      <DbStatus />
+      {role === 'admin' && <SystemHealth />}
     </div>
   );
 }
 
-function DbStatus() {
-  const [status, setStatus] = useState<'checking' | 'connected' | 'disconnected'>('checking');
+function SystemHealth() {
+  const [status, setStatus] = useState<'idle' | 'checking' | 'connected' | 'error'>('idle');
+  const [speed, setSpeed] = useState<number | null>(null);
 
-  useEffect(() => {
-    checkDb();
-    const interval = setInterval(checkDb, 30000); // Poll every 30s
-    return () => clearInterval(interval);
-  }, []);
-
-  const checkDb = async () => {
+  const checkSystem = async () => {
+    setStatus('checking');
+    setSpeed(null);
+    const start = performance.now();
     try {
       const res = await fetch('/api/health');
+      const end = performance.now();
+      setSpeed(Math.round(end - start));
+      
       if (res.ok) {
         setStatus('connected');
       } else {
-        setStatus('disconnected');
+        setStatus('error');
       }
     } catch (e) {
-      setStatus('disconnected');
+      setStatus('error');
     }
   };
 
   const getColor = () => {
     if (status === 'checking') return '#fbbf24'; // yellow
     if (status === 'connected') return '#22c55e'; // green
-    return '#ef4444'; // red
+    if (status === 'error') return '#ef4444'; // red
+    return '#94a3b8'; // gray
   };
 
   return (
     <div style={{ 
-        padding: '0.5rem 1rem', 
-        fontSize: '0.75rem', 
-        color: 'var(--text-muted)', 
-        display: 'flex', 
-        alignItems: 'center', 
-        gap: '0.5rem',
         borderTop: '1px solid rgba(255,255,255,0.1)',
-        marginTop: '0.5rem'
+        marginTop: '0.5rem',
+        paddingTop: '1rem'
     }}>
-      <div style={{ 
-          width: '8px', 
-          height: '8px', 
-          borderRadius: '50%', 
-          opacity: 0.8,
-          backgroundColor: getColor(),
-          boxShadow: `0 0 5px ${getColor()}`
-      }} />
-      <span>DB: {status.charAt(0).toUpperCase() + status.slice(1)}</span>
+      <div style={{ paddingLeft: '1rem', marginBottom: '0.5rem', fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--text-muted)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <span>SYSTEM STATUS</span>
+        <button 
+           onClick={checkSystem}
+           disabled={status === 'checking'}
+           title="Reload Status"
+           style={{ background: 'none', border: 'none', color: 'var(--accent)', cursor: 'pointer', padding: 0 }}
+        >
+           <Activity size={14} />
+        </button>
+      </div>
+
+      <div style={{ padding: '0 1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+          <Database size={14} />
+          <div style={{ 
+              width: '8px', 
+              height: '8px', 
+              borderRadius: '50%', 
+              backgroundColor: getColor(),
+              boxShadow: status === 'connected' ? `0 0 5px ${getColor()}` : 'none'
+          }} />
+          <span>{status === 'idle' ? 'Unknown' : status.charAt(0).toUpperCase() + status.slice(1)}</span>
+        </div>
+        
+        {speed !== null && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+             <Zap size={14} />
+             <span>Speed: {speed}ms</span>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

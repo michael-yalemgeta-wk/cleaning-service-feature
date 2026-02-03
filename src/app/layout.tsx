@@ -5,13 +5,30 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ThemeToggleFAB from "@/components/ThemeToggleFAB";
 import ThemeProvider from "@/providers/ThemeProvider";
+import fs from 'fs/promises';
+import path from 'path';
 
 const inter = Inter({ subsets: ["latin"] });
 
-export const metadata: Metadata = {
-  title: "Pristine Clean | Professional Cleaning Services",
-  description: "Top-rated home and office cleaning services. Book online in seconds.",
-};
+async function getSettings() {
+  try {
+    const filePath = path.join(process.cwd(), 'data', 'settings.json');
+    const data = await fs.readFile(filePath, 'utf-8');
+    return JSON.parse(data);
+  } catch (error) {
+    return {};
+  }
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSettings();
+  const companyName = settings.companyName || "Cleaning Services";
+  
+  return {
+    title: `${companyName} | Professional Cleaning Services`,
+    description: "Top-rated home and office cleaning services. Book online in seconds.",
+  };
+}
 
 export default function RootLayout({
   children,

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Clock, LogOut, TrendingUp, DollarSign } from "lucide-react";
+import { Check, Clock, LogOut, TrendingUp, DollarSign, Bell, Calendar } from "lucide-react";
 
 type Booking = {
   id: string;
@@ -18,9 +18,19 @@ type Booking = {
   payment?: any;
 };
 
+type Notification = {
+  id: string;
+  type: string;
+  title: string;
+  message: string;
+  createdAt: string;
+  priority?: string;
+};
+
 export default function Dashboard() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [analytics, setAnalytics] = useState<any>(null);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
@@ -35,29 +45,23 @@ export default function Dashboard() {
 
   const fetchData = async () => {
     try {
-      const [bookingsRes, analyticsRes] = await Promise.all([
+      const [bookingsRes, analyticsRes, notificationsRes] = await Promise.all([
         fetch("/api/bookings"),
-        fetch("/api/analytics")
+        fetch("/api/analytics"),
+        fetch("/api/notifications"),
       ]);
       const bookingsData = await bookingsRes.json();
       const analyticsData = await analyticsRes.json();
+      const notificationsData = await notificationsRes.json();
       
       setBookings(bookingsData.reverse());
       setAnalytics(analyticsData);
+      setNotifications(notificationsData);
     } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
     }
-  };
-
-  const updateStatus = async (id: string, status: string) => {
-    await fetch("/api/bookings", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, status }),
-    });
-    fetchData();
   };
 
   const logout = () => {
@@ -69,6 +73,10 @@ export default function Dashboard() {
 
   const pendingBookings = bookings.filter(b => b.status === 'Pending');
   const todayRevenue = analytics?.overview?.totalRevenue || 0;
+  
+  // Today's Jobs logic
+  const todayStr = new Date().toISOString().split('T')[0];
+  const todaysJobs = bookings.filter(b => b.date === todayStr);
 
   return (
     <div className="section container">
@@ -78,6 +86,38 @@ export default function Dashboard() {
           <LogOut size={18} /> Logout
         </button>
       </div>
+
+      {/* Important Notifications */}
+      {notifications.length > 0 && (
+        <div className="mb-lg">
+          <h2 className="mb-md flex items-center gap-sm">
+            <Bell size={24} className="text-primary" /> Important Notifications
+          </h2>
+          <div className="flex flex-col gap-sm">
+            {notifications.slice(0, 3).map((notif) => (
+              <div 
+                key={notif.id} 
+                className="card" 
+                style={{ 
+                  padding: '1rem', 
+                  borderLeft: `4px solid ${notif.priority === 'critical' ? '#ef4444' : notif.priority === 'high' ? '#f59e0b' : '#3b82f6'}`,
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}
+              >
+                <div>
+                  <h4 style={{ margin: 0, fontSize: '1rem' }}>{notif.title}</h4>
+                  <p style={{ margin: '0.25rem 0 0', color: 'var(--text-muted)', fontSize: '0.9rem' }}>{notif.message}</p>
+                </div>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                  {new Date(notif.createdAt).toLocaleDateString()}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Quick Stats */}
       {analytics && (
@@ -124,6 +164,48 @@ export default function Dashboard() {
         </div>
       )}
 
+      {/* Today's Jobs */}
+      <div className="mb-lg">
+        <h2 className="mb-md flex items-center gap-sm">
+            <Calendar size={24} className="text-primary" /> Today's Jobs ({todaysJobs.length})
+        </h2>
+        {todaysJobs.length === 0 ? (
+             <div className="card text-center" style={{ padding: '2rem', color: 'var(--text-muted)' }}>
+                No jobs scheduled for today.
+             </div>
+        ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 'var(--spacing-md)' }}>
+                {todaysJobs.map(booking => (
+                    <div key={booking.id} className="card" style={{ borderLeft: '4px solid var(--primary)' }}>
+                        <div className="flex justify-between items-start mb-sm">
+                             <div style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>{booking.time}</div>
+                             <span style={{ 
+                                padding: '0.2rem 0.5rem', 
+                                borderRadius: '1rem', 
+                                fontSize: '0.75rem', 
+                                background: booking.status === 'Completed' ? '#e2e8f0' : '#dcfce7',
+                                color: booking.status === 'Completed' ? '#475569' : '#166534',
+                                fontWeight: 'bold'
+                            }}>
+                                {booking.status}
+                            </span>
+                        </div>
+                        <h4 style={{ margin: '0 0 0.5rem' }}>{booking.name}</h4>
+                        <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
+                            {booking.service}
+                        </div>
+                         {booking.assignedTo && (
+                             <div style={{ fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                                 <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#22c55e' }}></div>
+                                 Assigned
+                             </div>
+                         )}
+                    </div>
+                ))}
+            </div>
+        )}
+      </div>
+
       {/* Recent Bookings Table */}
       <div className="card" style={{ overflowX: 'auto' }}>
         <h2 className="mb-md">Recent Bookings</h2>
@@ -134,16 +216,15 @@ export default function Dashboard() {
               <th style={{ padding: '1rem' }}>Date/Time</th>
               <th style={{ padding: '1rem' }}>Customer</th>
               <th style={{ padding: '1rem' }}>Service</th>
-              <th style={{ padding: '1rem' }}>Actions</th>
             </tr>
           </thead>
           <tbody>
             {bookings.length === 0 ? (
               <tr>
-                 <td colSpan={5} className="text-center" style={{ padding: '2rem', color: 'var(--text-muted)' }}>No bookings found.</td>
+                 <td colSpan={4} className="text-center" style={{ padding: '2rem', color: 'var(--text-muted)' }}>No bookings found.</td>
               </tr>
             ) : (
-                bookings.slice(0, 10).map((booking) => (
+                bookings.slice(0, 4).map((booking) => (
                   <tr key={booking.id} style={{ borderBottom: '1px solid var(--border)' }}>
                     <td style={{ padding: '1rem' }}>
                       <span style={{ 
@@ -166,20 +247,6 @@ export default function Dashboard() {
                       <div style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>{booking.email}</div>
                     </td>
                     <td style={{ padding: '1rem' }}>{booking.service}</td>
-                    <td style={{ padding: '1rem' }}>
-                      <div style={{ display: 'flex', gap: '0.5rem' }}>
-                        {booking.status !== 'Confirmed' && booking.status !== 'Completed' && (
-                          <button onClick={() => updateStatus(booking.id, 'Confirmed')} className="btn btn-primary" style={{ padding: '0.5rem', fontSize: '0.875rem' }} title="Confirm">
-                            <Check size={16} />
-                          </button>
-                        )}
-                        {booking.status !== 'Completed' && (
-                          <button onClick={() => updateStatus(booking.id, 'Completed')} className="btn btn-secondary" style={{ padding: '0.5rem', fontSize: '0.875rem' }} title="Complete">
-                            <Clock size={16} />
-                          </button>
-                        )}
-                      </div>
-                    </td>
                   </tr>
                 ))
             )}

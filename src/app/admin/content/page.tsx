@@ -6,26 +6,46 @@ import Modal from "@/components/Modal";
 
 export default function ContentManagement() {
   const [content, setContent] = useState<any>({ hero: {}, testimonials: [] });
+  const [settings, setSettings] = useState<any>({});
   const [loading, setLoading] = useState(true);
   const [editingTestimonial, setEditingTestimonial] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    fetch("/api/content")
-      .then(res => res.json())
-      .then(data => {
-        setContent(data);
-        setLoading(false);
-      });
+    Promise.all([
+      fetch("/api/content").then(res => res.json()),
+      fetch("/api/settings").then(res => res.json())
+    ]).then(([contentData, settingsData]) => {
+      setContent(contentData);
+      setSettings(settingsData);
+      setLoading(false);
+    });
   }, []);
 
   const handleSave = async () => {
+    // Save content.json
     await fetch("/api/content", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(content)
     });
-    alert("Content saved!");
+
+    // Sync specific fields to settings.json
+    const updatedSettings = {
+      ...settings,
+      companyName: content.branding?.siteName || settings.companyName,
+      email: content.contact?.email || settings.email,
+      phone: content.contact?.phone || settings.phone
+    };
+    setSettings(updatedSettings);
+
+    await fetch("/api/settings", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updatedSettings)
+    });
+
+    alert("Content and Settings saved!");
   };
 
   const addTestimonial = () => {
@@ -72,6 +92,7 @@ export default function ContentManagement() {
             <input 
               value={content.branding?.siteName || ""} 
               onChange={e => setContent({...content, branding: {...content.branding, siteName: e.target.value}})}
+              placeholder={settings.companyName || "Enter your company name"}
             />
           </div>
           <div className="form-group">
@@ -128,7 +149,7 @@ export default function ContentManagement() {
                 fontWeight: 'bold',
                 fontSize: '1.2rem'
               }}>
-                {(content.branding?.siteName || "P").charAt(0).toUpperCase()}
+                {(settings.companyName || content.branding?.siteName || "P").charAt(0).toUpperCase()}
               </div>
             )}
             <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
@@ -146,7 +167,9 @@ export default function ContentManagement() {
           <input 
             value={content.hero.title || ""} 
             onChange={e => setContent({...content, hero: {...content.hero, title: e.target.value}})}
+            placeholder={settings.companyName ? `${settings.companyName} Services` : "Experience the Perfect Clean"}
           />
+           <small className="text-muted">Leave empty to use default: "{settings.companyName ? `${settings.companyName} Services` : "Experience the Perfect Clean"}"</small>
         </div>
         <div className="form-group">
           <label>Subtitle</label>
@@ -173,15 +196,17 @@ export default function ContentManagement() {
           <div className="form-group">
             <label>Email Address</label>
             <input 
-              value={content.contact?.email || ""} 
+              value={settings.email || content.contact?.email || ""} 
               onChange={e => setContent({...content, contact: {...content.contact, email: e.target.value}})}
+              placeholder="contact@example.com"
             />
           </div>
           <div className="form-group">
             <label>Phone Number</label>
             <input 
-              value={content.contact?.phone || ""} 
+              value={settings.phone || content.contact?.phone || ""} 
               onChange={e => setContent({...content, contact: {...content.contact, phone: e.target.value}})}
+              placeholder="123-456-7890"
             />
           </div>
           <div className="form-group">
