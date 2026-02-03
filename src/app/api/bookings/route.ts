@@ -21,6 +21,26 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
+    // Check for existing bookings at the same date and time to prevent double booking
+    if (body.date && body.time) {
+      const existingBooking = await prisma.booking.findFirst({
+        where: {
+          date: body.date,
+          time: body.time,
+          status: {
+            not: 'Cancelled' // Don't count cancelled bookings
+          }
+        }
+      });
+
+      if (existingBooking) {
+        return NextResponse.json({ 
+          error: 'This time slot is already booked. Please select a different time.',
+          code: 'SLOT_UNAVAILABLE'
+        }, { status: 409 }); // 409 Conflict
+      }
+    }
+
     // Generate unique cleaning code
     const timestamp = Date.now();
     const randomStr = Math.random().toString(36).substring(2, 8).toUpperCase();

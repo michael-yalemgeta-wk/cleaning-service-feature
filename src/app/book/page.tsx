@@ -30,6 +30,7 @@ function BookingForm() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [bookedSlots, setBookedSlots] = useState<string[]>([]);
 
   useEffect(() => {
     Promise.all([
@@ -50,6 +51,23 @@ function BookingForm() {
     }
   }, [preSelectedService, services]);
 
+  // Fetch booked slots when date changes
+  useEffect(() => {
+    if (formData.date) {
+      fetch(`/api/check-availability?date=${formData.date}`)
+        .then(res => res.json())
+        .then(data => {
+          setBookedSlots(data.bookedSlots || []);
+        })
+        .catch(err => {
+          console.error('Failed to fetch availability:', err);
+          setBookedSlots([]);
+        });
+    } else {
+      setBookedSlots([]);
+    }
+  }, [formData.date]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -60,8 +78,8 @@ function BookingForm() {
   };
 
   const selectedService = services.find(s => s.id === formData.service);
-  const subtotal = selectedService?.price || 0;
-  const tax = subtotal * (settings.taxRate || 0);
+  const subtotal = Number(selectedService?.price) || 0;
+  const tax = subtotal * (Number(settings.taxRate) || 0);
   const total = subtotal + tax;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -85,10 +103,19 @@ function BookingForm() {
       if (res.ok) {
         setSuccess(true);
       } else {
-        alert("Something went wrong. Please try again.");
+        const errorData = await res.json().catch(() => ({}));
+        
+        // Handle specific error cases
+        if (res.status === 409) {
+          // Double booking conflict
+          alert(errorData.error || "This time slot is already booked. Please select a different time.");
+          setStep(2); // Go back to date/time selection step
+        } else {
+          alert(errorData.error || "Something went wrong. Please try again.");
+        }
       }
     } catch (err) {
-      alert("Error submitting booking.");
+      alert("Error submitting booking. Please check your connection and try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -190,11 +217,14 @@ function BookingForm() {
                   <option value="">Select a time</option>
                   {settings.timeSlots?.slots
                     ?.filter((slot: any) => slot.enabled)
-                    ?.map((slot: any) => (
-                      <option key={slot.id} value={slot.time}>
-                        {slot.time} ({slot.duration || 120} minutes)
-                      </option>
-                    ))}
+                    ?.map((slot: any) => {
+                      const isBooked = bookedSlots.includes(slot.time);
+                      return (
+                        <option key={slot.id} value={slot.time} disabled={isBooked}>
+                          {slot.time} ({slot.duration || 120} minutes) {isBooked ? "- Already booked" : ""}
+                        </option>
+                      );
+                    })}
                 </select>
               </div>
               <div className="flex justify-between">

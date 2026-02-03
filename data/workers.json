@@ -12,5 +12,19 @@
     "staffId": "staff-1770044983920",
     "name": "worker b",
     "id": "worker-1770044998217"
+  },
+  {
+    "username": "admin@creativestudio.com",
+    "password": "admin123",
+    "staffId": "staff-1770112151964",
+    "name": "b",
+    "id": "worker-1770112155686"
+  },
+  {
+    "username": "admin@creativestudio.com",
+    "password": "admin123",
+    "staffId": "staff-1770124561950",
+    "name": "n",
+    "id": "worker-1770124568277"
   }
 ]

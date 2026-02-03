@@ -119,12 +119,16 @@ export default function BookingsPage() {
 
     // Check availability
     if (staffId) {
-      const availRes = await fetch(`/api/availability?staffId=${staffId}&date=${booking.date}&time=${booking.time}`);
-      const availData = await availRes.json();
-      
-      if (!availData.available) {
-        alert(`This staff member is already booked at ${booking.time} on ${booking.date}. Please choose a different time or staff member.`);
-        return;
+      try {
+        const availRes = await fetch(`/api/availability?staffId=${staffId}&date=${booking.date}&time=${booking.time}&excludeBookingId=${bookingId}`);
+        const availData = await availRes.json();
+        
+        if (availData.available === false) {
+          alert(`This staff member is already booked at ${booking.time} on ${booking.date}. Please choose a different time or staff member.`);
+          return;
+        }
+      } catch (err) {
+        console.error("Availability check failed:", err);
       }
     }
 

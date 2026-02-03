@@ -14,10 +14,23 @@ export default function ServicesPage() {
   }, []);
 
   const fetchServices = async () => {
-    const res = await fetch("/api/services");
-    const data = await res.json();
-    setServices(data);
-    setLoading(false);
+    try {
+      const res = await fetch("/api/services");
+      const data = await res.json();
+      
+      // Check if the response is an error object
+      if (data.error || !Array.isArray(data)) {
+        console.error('Failed to fetch services:', data.error || 'Invalid response');
+        setServices([]);
+      } else {
+        setServices(data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch services:', error);
+      setServices([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSave = async (service: any) => {
@@ -144,7 +157,14 @@ export default function ServicesPage() {
                 </tr>
             </thead>
             <tbody>
-                {services.map(s => (
+                {services.length === 0 ? (
+                    <tr>
+                        <td colSpan={6} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+                            {loading ? 'Loading services...' : 'No services found. Click "Add Service" to create one.'}
+                        </td>
+                    </tr>
+                ) : (
+                    services.map(s => (
                     <tr key={s.id} style={{ borderBottom: '1px solid var(--border)' }}>
                         <td style={{ padding: '1rem' }}>
                             {editingId === s.id ? (
@@ -263,7 +283,8 @@ export default function ServicesPage() {
                             )}
                         </td>
                     </tr>
-                ))}
+                ))
+                )}
             </tbody>
         </table>
       </div>
