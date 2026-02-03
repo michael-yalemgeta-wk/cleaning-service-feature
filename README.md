@@ -1,36 +1,94 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Pristine Clean | Professional Service Management Platform
 
-## Getting Started
+A cutting-edge, full-stack management system designed for cleaning service providers. This platform streamlines the entire business lifecycle, from customer booking to staff assignment and task completion.
 
-First, run the development server:
+![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
+![Next.js](https://img.shields.io/badge/Next.js-15.1.4-black.svg)
+![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🚀 Key Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### For Customers
+- **Intuitive Booking Flow**: A seamless 4-step booking process with real-time feedback.
+- **Real-time Availability**: Dynamic time-slot selection that prevents double bookings.
+- **Order Summary**: Instant tax calculations and transparent pricing.
+- **Simulated Payment**: Integrated payment method selection (Credit Card, PayPal, Cash).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### For Administration
+- **Centralized Dashboard**: Oversight of all active, pending, and completed bookings.
+- **Conflict-Aware Scheduling**: Intelligent staff assignment that prevents scheduling overlaps.
+- **Task Management**: Break down bookings into granular tasks for staff.
+- **Staff Performance**: Track job completion and performance ratings.
+- **Financial Status**: Monitor payment status (Paid/Unpaid) with quick-toggle functionality.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🛠️ Tech Stack
 
-## Learn More
+- **Framework**: Next.js 15 (App Router)
+- **Language**: TypeScript
+- **Database**: PostgreSQL
+- **ORM**: Prisma
+- **State Management**: React Hooks (useState, useEffect)
+- **Icons**: Lucide React
+- **Styling**: Vanilla CSS (Modern Design System with Dark Mode support)
 
-To learn more about Next.js, take a look at the following resources:
+## 🏁 Getting Started
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Prerequisites
+- Node.js 18.x or later
+- PostgreSQL database instance
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Installation
 
-## Deploy on Vercel
+1. **Clone the repository:**
+   ```bash
+   git clone [repository-url]
+   cd vast-hubble
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+3. **Configure Environment Variables:**
+   Create a `.env` file in the root directory:
+   ```env
+   DATABASE_URL="postgresql://user:password@localhost:5432/pristine_clean"
+   DIRECT_URL="postgresql://user:password@localhost:5432/pristine_clean"
+   ```
+
+4. **Initialize Database:**
+   ```bash
+   npx prisma generate
+   npx prisma db push
+   ```
+
+5. **Start Development Server:**
+   ```bash
+   npm run dev
+   ```
+
+## 📂 Project Structure
+
+- `src/app/book`: Customer-facing booking application.
+- `src/app/admin`: Secure administration dashboard and management tools.
+- `src/app/api`: Robust RESTful API endpoints for data operations.
+- `src/components`: Reusable UI components (DatePicker, Modal, Navbar, etc.).
+- `prisma/`: Database schema and migration configurations.
+- `public/`: Static assets and media.
+
+## 🛡️ Best Practices Implemented
+
+- **Atomic Components**: Reusable, modular UI elements.
+- **Server/Client Separation**: Optimized Next.js data fetching.
+- **Form Validation**: Client and server-side checks for data integrity.
+- **Hydration Safety**: Suppressed hydration warnings for browser-extension compatibility.
+- **Dynamic Routing**: CleanURL structure for administrative views.
+
+## 📄 License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+---
+*Built with ❤️ by the Pristine Clean Team.*
