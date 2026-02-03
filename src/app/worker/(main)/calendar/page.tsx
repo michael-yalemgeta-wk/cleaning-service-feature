@@ -5,14 +5,14 @@ import WorkCalendar from "@/components/WorkCalendar";
 import { Calendar as CalendarIcon } from "lucide-react";
 
 export default function WorkerCalendarPage() {
-  const [workerId, setWorkerId] = useState<string | null>(null);
+  const [staffId, setStaffId] = useState<string | null>(null);
 
   useEffect(() => {
-    const id = localStorage.getItem("workerId");
-    setWorkerId(id);
+    const sid = localStorage.getItem("workerStaffId");
+    setStaffId(sid);
   }, []);
 
-  if (!workerId) return <div className="section container">Loading...</div>;
+  if (!staffId) return <div className="section container">Loading...</div>;
 
   return (
     <div className="section container">
@@ -20,7 +20,7 @@ export default function WorkerCalendarPage() {
         <CalendarIcon /> My Schedule
       </h1>
       <p className="text-muted mb-md">Your assigned jobs and tasks.</p>
-      <WorkCalendar role="worker" staffId={workerId} />
+      <WorkCalendar role="worker" staffId={staffId} />
     </div>
   );
 }
